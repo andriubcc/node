@@ -6,7 +6,7 @@ import { Request, Response } from 'express';
 
 class VideosRepository {
     create(request: Request, response: Response){
-        const { title, description, user_id } = request.query;
+        const { title, description, user_id } = request.body;
         pool.getConnection((err: any, connection: any) => {
                 connection.query (
                     'INSERT INTO videos (video_id, user_id, title, description) VALUES(?,?,?,?)',
@@ -23,7 +23,7 @@ class VideosRepository {
     }
 
     getVideos(request: Request, response: Response){
-        const { user_id } = request.body;
+        const { user_id } = request.query;
         pool.getConnection((err: any, connection: any) => {
             connection.query (
                 'SELECT * FROM videos WHERE user_id = ?',
@@ -40,7 +40,7 @@ class VideosRepository {
     }
 
     searchVideos(request: Request, response: Response){
-        const { search } = request.body;
+        const { search } = request.query;
         pool.getConnection((err: any, connection: any) => {
             connection.query (
                 'SELECT * FROM videos WHERE title LIKE ?',

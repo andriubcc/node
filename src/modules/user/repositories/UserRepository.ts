@@ -3,6 +3,7 @@ import { v4 as uuid4v } from 'uuid';
 import { hash, compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { Request, Response } from 'express';
+import { verify } from 'jsonwebtoken';
 
 class UserRepository {
     create(request: Request, response: Response){
@@ -47,7 +48,7 @@ class UserRepository {
                                 const token = sign({
                                     id: results[0].user_id,
                                     email: results[0].email
-                                }, "segredo", {expiresIn: "30d"})
+                                }, process.env.SECRET as string, {expiresIn: "30d"})
     
                                 console.log(token)
     
@@ -57,6 +58,35 @@ class UserRepository {
                     }
             )
         })
+    }
+
+    getUser(request: any, response: any){
+        const decode: any = verify(request.headers.authorization, process.env.SECRET as string);
+        if(decode.email){
+        pool.getConnection((error, conn) => {
+            conn.query(
+                'SELECT * FROM users WHERE email = ?',
+                [decode.email],
+                (error, resultado, fields) => {
+                    conn.release();
+                if(error){
+                    return response.status(400).send({
+                        error: error,
+                        response: null
+                    })
+                }
+
+                return response.status(201).send({
+                    user: {
+                        nome: resultado[0].name,
+                        email: resultado[0].email,
+                        id: resultado[0].user_id,
+                    }
+                })
+            }
+        )
+        })
+        }
     }
 }
 

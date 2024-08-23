@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { VideosRepository } from '../modules/videos/repositories/VideosRepository';
+import { login } from '../middleware/login';
+import { upload } from '../server';
 
 const videosRoutes = Router();
 const videosRepository = new VideosRepository();
 
-videosRoutes.post('/create-video', (request, response) => {
+videosRoutes.post('/create-video', login, (request, response) => {
     videosRepository.create(request, response);
 })
 
