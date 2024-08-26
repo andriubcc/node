@@ -1,8 +1,7 @@
 import { pool } from '../../../mysql';
 import { v4 as uuid4v } from 'uuid';
-import { hash, compare } from 'bcrypt';
-import { sign } from 'jsonwebtoken';
 import { Request, Response } from 'express';
+
 
 class VideosRepository {
     create(request: Request, response: Response){
@@ -20,6 +19,23 @@ class VideosRepository {
                      }
                 )
             })
+    }
+
+    uploadVideos(request: Request, response: Response) {
+        const { title, description, user_id, video_date, videoPath } = request.body;
+        pool.getConnection((err: any, connection: any) => {
+            connection.query (
+                'INSERT INTO videos (video_id, user_id, title, description, video_date, videoPath) VALUES(?,?,?,?,?,?)'
+                [uuid4v(), user_id, title, title, description, video_date, videoPath],
+                (error: any, result: any, fileds: any) => {
+                    connection.release();
+                    if(error) {
+                        return response.status(400).json(error)
+                    }
+                    response.status(200).json({message: 'Video upado com sucesso'})
+                }
+            )
+        })
     }
 
     getVideos(request: Request, response: Response){

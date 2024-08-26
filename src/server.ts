@@ -8,8 +8,6 @@ const app = express();
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-const uuid4v = require('uuid')
 
 
 app.use(function(req, res, next) {
@@ -21,24 +19,42 @@ app.use(function(req, res, next) {
 
 app.use(cors());
 app.use(express.json());
-app.use('/user', userRoutes);
-app.use('/videos', videosRoutes);
 
-const uploadDir = path.join(__dirname, '..', 'uploads');
- if(!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-}
 
 const storage = multer.diskStorage ({
-    destination: (req: any, file: any, cb: any) => {
-        cb(null, uploadDir);
+    destination: function(req: any, file: any, cb: any){
+        cb(null, 'uploads/videos');
     },
-    filename: (req: any, file: any, cb: any) => {
-        const uniquename = `${uuid4v()}-${file.originalname}`
+    filename: function(req: any, file: any, cb: any) {
+        cb(null, Date.now()+'-'+file.originalname);
     }
 });
 
-export const upload = multer(storage)
+const fileFilter = (req: any, file: any, cb: any) => {
+    const allowedFileType = /mp4|mov|avi|mkv/;
+    const mimeType = allowedFileType.test(file.mimetype);
+    const extname = allowedFileType.test(path.extname(file.originalname).toLowerCase());
+
+    if(mimeType && extname) {
+        return cb(null,true);
+    } else {
+        cb(new Error('Tipo de arquivo nao aceito'))
+    }
+};
+
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+});
+
+module.exports = {upload};
+
+app.use('/user', userRoutes);
+app.use('/videos', videosRoutes);
+
+
+
+
 
 
 
