@@ -51,6 +51,7 @@ class UserRepository {
                                 }, process.env.SECRET as string, {expiresIn: "30d"})
     
                                 console.log(token)
+
     
                                 return response.status(200).json({token: token, message: 'Autenticado com sucesso'})
                             }
@@ -89,5 +90,5 @@ class UserRepository {
         }
     }
 }
-
+    
 export { UserRepository };

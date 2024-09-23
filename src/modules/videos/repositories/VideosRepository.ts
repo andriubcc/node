@@ -1,15 +1,15 @@
 import { pool } from '../../../mysql';
 import { v4 as uuid4v } from 'uuid';
 import { Request, Response } from 'express';
-
+import { verify } from 'jsonwebtoken';
 
 class VideosRepository {
     create(request: Request, response: Response){
-        const { title, description, user_id } = request.body;
+        const { title, description, user_id, video_date, URL } = request.body;
         pool.getConnection((err: any, connection: any) => {
                 connection.query (
-                    'INSERT INTO videos (video_id, user_id, title, description) VALUES(?,?,?,?)',
-                     [uuid4v(), user_id, title, description],
+                    'INSERT INTO videos (video_id, user_id, title, description, video_date, URL) VALUES(?,?,?,?,?,?)',
+                     [uuid4v(), user_id, title, description, video_date, URL],
                      (error: any, result: any, fileds: any) => {
                         connection.release();
                         if(error) {
@@ -21,25 +21,8 @@ class VideosRepository {
             })
     }
 
-    uploadVideos(request: Request, response: Response) {
-        const { title, description, user_id, video_date, videoPath } = request.body;
-        pool.getConnection((err: any, connection: any) => {
-            connection.query (
-                'INSERT INTO videos (video_id, user_id, title, description, video_date, videoPath) VALUES(?,?,?,?,?,?)'
-                [uuid4v(), user_id, title, title, description, video_date, videoPath],
-                (error: any, result: any, fileds: any) => {
-                    connection.release();
-                    if(error) {
-                        return response.status(400).json(error)
-                    }
-                    response.status(200).json({message: 'Video upado com sucesso'})
-                }
-            )
-        })
-    }
-
     getVideos(request: Request, response: Response){
-        const { user_id } = request.query;
+        const { user_id } = request.params;
         pool.getConnection((err: any, connection: any) => {
             connection.query (
                 'SELECT * FROM videos WHERE user_id = ?',
