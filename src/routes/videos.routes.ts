@@ -15,7 +15,7 @@ videosRoutes.get('/get-videos/:user_id', (request, response) => {
     videosRepository.getVideos(request, response);
 })
 
-videosRoutes.post('/search', (request, response) => {
+videosRoutes.get('/search', (request, response) => {
     videosRepository.searchVideos(request, response);
 })
 

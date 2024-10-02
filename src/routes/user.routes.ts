@@ -18,4 +18,9 @@ userRoutes.get('/get-user', login, (request, response) => {
     userRepository.getUser(request, response);
 })
 
+userRoutes.get('/get-user/:user_id', (request, response) => {
+    userRepository.getUserById(request, response);
+})
+
+
 export { userRoutes };
